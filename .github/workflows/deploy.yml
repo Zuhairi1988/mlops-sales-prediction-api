@@ -1,0 +1,38 @@
+name: Deploy FastAPI to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            cd ~/mlops-sales-prediction-api
+
+            git pull origin main
+
+            sudo docker stop sales-api || true
+            sudo docker rm sales-api || true
+
+            sudo docker build -t sales-api .
+
+            sudo docker run -d \
+              --name sales-api \
+              -p 8000:8000 \
+              sales-api
