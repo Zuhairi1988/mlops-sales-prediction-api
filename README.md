@@ -1,4 +1,4 @@
-Sales Prediction MLOps System
+**Sales Prediction MLOps System**
 Project Overview
 
 This project is an end-to-end MLOps Sales Prediction System developed using Machine Learning, FastAPI, Docker, MLflow, GitHub Actions CI/CD, and AWS EC2 deployment.
