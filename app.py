@@ -42,10 +42,7 @@ class SalesInput(BaseModel):
 
 def home():
 
-    return {
-        "message": "Sales Prediction API is running"
-    }
-
+    return {"message": "CI/CD Success"}
 
 # =====================================
 # PREDICTION ROUTE
