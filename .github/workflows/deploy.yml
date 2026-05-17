@@ -27,8 +27,8 @@ jobs:
 
             git pull origin main
 
-            sudo docker stop sales-api || true
-            sudo docker rm sales-api || true
+            sudo docker stop $(sudo docker ps -aq) || true
+            sudo docker rm $(sudo docker ps -aq) || true
 
             sudo docker build -t sales-api .
 
