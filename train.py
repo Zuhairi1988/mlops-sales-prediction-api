@@ -5,7 +5,13 @@ import joblib
 import mlflow
 import mlflow.sklearn
 
-mlflow.set_tracking_uri("file:./mlruns")
+# =====================================
+# MLFLOW CONFIG
+# =====================================
+
+mlflow.set_tracking_uri(
+    "http://54.251.85.54:5000"
+)
 
 mlflow.set_experiment(
     "Sales Prediction"
@@ -34,7 +40,9 @@ from sklearn.metrics import (
 # LOAD DATA
 # =====================================
 
-df = pd.read_csv('retail_sales_dataset.csv')
+df = pd.read_csv(
+    'retail_sales_dataset.csv'
+)
 
 # =====================================
 # TARGET TRANSFORM
@@ -49,7 +57,12 @@ df['sales_amount_log'] = np.log1p(
 # =====================================
 
 X = df[
-    ['unit_price', 'quantity', 'brand', 'category']
+    [
+        'unit_price',
+        'quantity',
+        'brand',
+        'category'
+    ]
 ]
 
 y = df['sales_amount_log']
@@ -74,7 +87,9 @@ preprocessor = ColumnTransformer(
 
         (
             'onehot',
-            OneHotEncoder(handle_unknown='ignore'),
+            OneHotEncoder(
+                handle_unknown='ignore'
+            ),
             ['brand', 'category']
         ),
 
@@ -116,113 +131,118 @@ pipeline = Pipeline([
 ])
 
 # =====================================
-# START MLFLOW
+# START MLFLOW RUN
 # =====================================
 
-mlflow.start_run()
+with mlflow.start_run(
+    run_name="Polynomial Regression V1"
+):
 
-# =====================================
-# LOG PARAMETERS
-# =====================================
+    # =====================================
+    # LOG PARAMETERS
+    # =====================================
 
-mlflow.log_param(
-    'model_type',
-    'Polynomial Regression'
-)
+    mlflow.log_param(
+        'model_type',
+        'Polynomial Regression'
+    )
 
-mlflow.log_param(
-    'degree',
-    2
-)
+    mlflow.log_param(
+        'degree',
+        2
+    )
 
-mlflow.log_param(
-    'features',
-    ['unit_price', 'quantity', 'brand', 'category']
-)
+    mlflow.log_param(
+        'features',
+        [
+            'unit_price',
+            'quantity',
+            'brand',
+            'category'
+        ]
+    )
 
-# =====================================
-# TRAIN MODEL
-# =====================================
+    # =====================================
+    # TRAIN MODEL
+    # =====================================
 
-pipeline.fit(
-    x_train,
-    y_train
-)
+    pipeline.fit(
+        x_train,
+        y_train
+    )
 
-# =====================================
-# PREDICTION
-# =====================================
+    # =====================================
+    # PREDICTION
+    # =====================================
 
-y_pred = pipeline.predict(
-    x_test
-)
+    y_pred = pipeline.predict(
+        x_test
+    )
 
-# =====================================
-# EVALUATION
-# =====================================
+    # =====================================
+    # EVALUATION
+    # =====================================
 
-r2 = r2_score(
-    y_test,
-    y_pred
-)
+    r2 = r2_score(
+        y_test,
+        y_pred
+    )
 
-rmse = root_mean_squared_error(
-    y_test,
-    y_pred
-)
+    rmse = root_mean_squared_error(
+        y_test,
+        y_pred
+    )
 
-mae = mean_absolute_error(
-    y_test,
-    y_pred
-)
+    mae = mean_absolute_error(
+        y_test,
+        y_pred
+    )
 
-print(f"R2 Score : {r2:.4f}")
-print(f"RMSE     : {rmse:.4f}")
-print(f"MAE      : {mae:.4f}")
+    # =====================================
+    # PRINT METRICS
+    # =====================================
 
-# =====================================
-# LOG METRICS
-# =====================================
+    print(f"R2 Score : {r2:.4f}")
+    print(f"RMSE     : {rmse:.4f}")
+    print(f"MAE      : {mae:.4f}")
 
-mlflow.log_metric(
-    'r2_score',
-    r2
-)
+    # =====================================
+    # LOG METRICS
+    # =====================================
 
-mlflow.log_metric(
-    'rmse',
-    rmse
-)
+    mlflow.log_metric(
+        'r2_score',
+        r2
+    )
 
-mlflow.log_metric(
-    'mae',
-    mae
-)
+    mlflow.log_metric(
+        'rmse',
+        rmse
+    )
 
-# =====================================
-# SAVE MODEL
-# =====================================
+    mlflow.log_metric(
+        'mae',
+        mae
+    )
 
-joblib.dump(
-    pipeline,
-    'sales_prediction_model_poly.pkl'
-)
+    # =====================================
+    # SAVE MODEL
+    # =====================================
 
-print("\nModel Saved Successfully")
+    joblib.dump(
+        pipeline,
+        'sales_prediction_model_poly.pkl'
+    )
 
-# =====================================
-# LOG MODEL TO MLFLOW
-# =====================================
+    print("\nModel Saved Successfully")
 
-mlflow.sklearn.log_model(
-    pipeline,
-    artifact_path='model'
-)
+    # =====================================
+    # LOG MODEL TO MLFLOW
+    # =====================================
 
-# =====================================
-# END MLFLOW RUN
-# =====================================
+    # mlflow.sklearn.log_model(
+#     sk_model=pipeline,
+#     artifact_path='model'
+# )
 
-mlflow.end_run()
-
-print("MLflow Tracking Completed")
+print("\nMLflow Tracking Completed")
